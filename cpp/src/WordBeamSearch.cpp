@@ -3,10 +3,19 @@
 #include <vector>
 #include <memory>
 
+#include <iostream>
+
 
 std::vector<uint32_t> wordBeamSearch(const IMatrix& mat, size_t beamWidth, const std::shared_ptr<LanguageModel>& lm, LanguageModelType lmType)
 {
-	// dim0: T, dim1: C
+    static int num = 0;
+    ++num;
+
+    if (num % 20 == 0) {
+        std::cout << "checking sentence " << num << std::endl;
+    }
+
+    // dim0: T, dim1: C
 	const size_t maxT = mat.rows();
 	const size_t maxC = mat.cols();
 	const size_t blank = maxC - 1;
@@ -17,6 +26,11 @@ std::vector<uint32_t> wordBeamSearch(const IMatrix& mat, size_t beamWidth, const
 	const bool useNGrams = lmType == LanguageModelType::NGrams || lmType == LanguageModelType::NGramsForecast || lmType==LanguageModelType::NGramsForecastAndSample;
 	const bool forcastNGrams = lmType == LanguageModelType::NGramsForecast || lmType == LanguageModelType::NGramsForecastAndSample;
 	const bool sampleNGrams = lmType == LanguageModelType::NGramsForecastAndSample;
+
+//    const bool useNGrams = true;
+//    const bool forcastNGrams = false;
+//    const bool sampleNGrams = false;
+
 	last.addBeam(std::make_shared<Beam>(lm, useNGrams, forcastNGrams, sampleNGrams));
 
 	// go over all time steps
